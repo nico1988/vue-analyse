@@ -54,7 +54,7 @@ export default class Dep {
 // can be evaluated at a time.
 Dep.target = null
 const targetStack = []
-
+// 用父子组件嵌套时 利用栈的数据结构 需要push和pop
 export function pushTarget (target: ?Watcher) {
   targetStack.push(target)
   Dep.target = target

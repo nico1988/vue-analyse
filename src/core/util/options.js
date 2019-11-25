@@ -283,6 +283,7 @@ export function validateComponentName (name: string) {
       'should conform to valid custom element name in html5 specification.'
     )
   }
+  // 是否html保留标签
   if (isBuiltInTag(name) || config.isReservedTag(name)) {
     warn(
       'Do not use built-in or reserved HTML elements as component ' +
@@ -390,6 +391,8 @@ export function mergeOptions (
   child: Object,
   vm?: Component
 ): Object {
+
+  // parent 和 child 做一个合并
   if (process.env.NODE_ENV !== 'production') {
     checkComponents(child)
   }
@@ -428,7 +431,7 @@ export function mergeOptions (
     }
   }
   function mergeField (key) {
-    const strat = strats[key] || defaultStrat
+    const strat = strats[key] || defaultStrat // 不同类型的合并策略
     options[key] = strat(parent[key], child[key], vm, key)
   }
   return options

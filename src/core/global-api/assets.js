@@ -12,6 +12,7 @@ export function initAssetRegisters (Vue: GlobalAPI) {
       id: string,
       definition: Function | Object
     ): Function | Object | void {
+
       if (!definition) {
         return this.options[type + 's'][id]
       } else {
@@ -26,7 +27,7 @@ export function initAssetRegisters (Vue: GlobalAPI) {
         if (type === 'directive' && typeof definition === 'function') {
           definition = { bind: definition, update: definition }
         }
-        this.options[type + 's'][id] = definition
+        this.options[type + 's'][id] = definition // 渲染vnode
         return definition
       }
     }

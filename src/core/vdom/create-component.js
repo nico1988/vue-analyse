@@ -108,12 +108,12 @@ export function createComponent (
   if (isUndef(Ctor)) {
     return
   }
-
+  // baseCtor ==  Vue
   const baseCtor = context.$options._base
 
   // plain options object: turn it into a constructor
   if (isObject(Ctor)) {
-    Ctor = baseCtor.extend(Ctor)
+    Ctor = baseCtor.extend(Ctor) // Vue.extend 创建构造器
   }
 
   // if at this stage it's not a constructor or an async component factory,
@@ -125,7 +125,7 @@ export function createComponent (
     return
   }
 
-  // async component
+  // async component 异步组件
   let asyncFactory
   if (isUndef(Ctor.cid)) {
     asyncFactory = Ctor
@@ -144,7 +144,7 @@ export function createComponent (
     }
   }
 
-  data = data || {}
+  data = data || {} // data处理
 
   // resolve constructor options in case global mixins are applied after
   // component constructor creation
@@ -183,10 +183,12 @@ export function createComponent (
   }
 
   // install component management hooks onto the placeholder node
+  // 安装一些组件的钩子 init prepach insert destroy
   installComponentHooks(data)
 
   // return a placeholder vnode
   const name = Ctor.options.name || tag
+  // 组件vnode的children是空  componentOptions
   const vnode = new VNode(
     `vue-component-${Ctor.cid}${name ? `-${name}` : ''}`,
     data, undefined, undefined, undefined, context,

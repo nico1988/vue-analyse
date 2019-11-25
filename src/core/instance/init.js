@@ -29,33 +29,41 @@ export function initMixin (Vue: Class<Component>) {
     // a flag to avoid this being observed
     vm._isVue = true
     // merge options
+
     if (options && options._isComponent) {
       // optimize internal component instantiation
       // since dynamic options merging is pretty slow, and none of the
       // internal component options needs special treatment.
       initInternalComponent(vm, options)
     } else {
+      console.log("_init 被调用1")
+      console.log("vm.$options = mergeOptions")
       vm.$options = mergeOptions(
         resolveConstructorOptions(vm.constructor),
         options || {},
         vm
       )
+      console.log("vm.$options: %o",vm.$options)
     }
     /* istanbul ignore else */
     if (process.env.NODE_ENV !== 'production') {
+      // 调用proxy render函数用到
       initProxy(vm)
     } else {
       vm._renderProxy = vm
     }
     // expose real self
     vm._self = vm
+    // 初始化
     initLifecycle(vm)
     initEvents(vm)
     initRender(vm)
+    // 执行beforeCreate钩子函数
     callHook(vm, 'beforeCreate')
     initInjections(vm) // resolve injections before data/props
     initState(vm)
     initProvide(vm) // resolve provide after data/props
+    // 执行created钩子函数
     callHook(vm, 'created')
 
     /* istanbul ignore if */
@@ -91,7 +99,8 @@ export function initInternalComponent (vm: Component, options: InternalComponent
 }
 
 export function resolveConstructorOptions (Ctor: Class<Component>) {
-  let options = Ctor.options
+  // 解决全局mixin
+  let options = Ctor.options // Ctor 就是Vue
   if (Ctor.super) {
     const superOptions = resolveConstructorOptions(Ctor.super)
     const cachedSuperOptions = Ctor.superOptions

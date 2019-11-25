@@ -523,7 +523,11 @@ function renderAttr (key, value) {
 }
 
 /*  */
-
+/**
+ * vnode其实就是一棵树 用来映射dom的扩展 不包括操作dom的接口
+ * vnode其实比dom简单的多
+ * vue的vnode参考snabbdom
+ */
 var VNode = function VNode (
   tag,
   data,
@@ -1018,7 +1022,7 @@ Dep.prototype.notify = function notify () {
 // can be evaluated at a time.
 Dep.target = null;
 var targetStack = [];
-
+// 用父子组件嵌套时 利用栈的数据结构 需要push和pop
 function pushTarget (target) {
   targetStack.push(target);
   Dep.target = target;
@@ -1100,7 +1104,7 @@ var Observer = function Observer (value) {
   this.value = value;
   this.dep = new Dep();
   this.vmCount = 0;
-  def(value, '__ob__', this);
+  def(value, '__ob__', this); // defineproperty进行了封装
   if (Array.isArray(value)) {
     if (hasProto) {
       protoAugment(value, arrayMethods);
@@ -1209,12 +1213,13 @@ function defineReactive$$1 (
     val = obj[key];
   }
 
-  var childOb = !shallow && observe(val);
+  var childOb = !shallow && observe(val); // 递归调用对象的子对象
   Object.defineProperty(obj, key, {
     enumerable: true,
     configurable: true,
-    get: function reactiveGetter () {
+    get: function reactiveGetter () { // 依赖收集
       var value = getter ? getter.call(obj) : val;
+      // 依赖收集
       if (Dep.target) {
         dep.depend();
         if (childOb) {
@@ -1226,7 +1231,7 @@ function defineReactive$$1 (
       }
       return value
     },
-    set: function reactiveSetter (newVal) {
+    set: function reactiveSetter (newVal) { // 响应更新
       var value = getter ? getter.call(obj) : val;
       /* eslint-disable no-self-compare */
       if (newVal === value || (newVal !== newVal && value !== value)) {
@@ -1244,7 +1249,7 @@ function defineReactive$$1 (
         val = newVal;
       }
       childOb = !shallow && observe(newVal);
-      dep.notify();
+      dep.notify(); // 派发更新
     }
   });
 }
@@ -1563,6 +1568,7 @@ function validateComponentName (name) {
       'should conform to valid custom element name in html5 specification.'
     );
   }
+  // 是否html保留标签
   if (isBuiltInTag(name) || config.isReservedTag(name)) {
     warn(
       'Do not use built-in or reserved HTML elements as component ' +
@@ -1670,6 +1676,8 @@ function mergeOptions (
   child,
   vm
 ) {
+
+  // parent 和 child 做一个合并
   {
     checkComponents(child);
   }
@@ -1708,7 +1716,7 @@ function mergeOptions (
     }
   }
   function mergeField (key) {
-    var strat = strats[key] || defaultStrat;
+    var strat = strats[key] || defaultStrat; // 不同类型的合并策略
     options[key] = strat(parent[key], child[key], vm, key);
   }
   return options
@@ -3123,7 +3131,7 @@ var startTagOpen = new RegExp(("^<" + qnameCapture));
 var startTagClose = /^\s*(\/?)>/;
 var endTag = new RegExp(("^<\\/" + qnameCapture + "[^>]*>"));
 var doctype = /^<!DOCTYPE [^>]+>/i;
-// #7298: escape - to avoid being pased as HTML comment when inlined in page
+// #7298: escape - to avoid being passed as HTML comment when inlined in page
 var comment = /^<!\--/;
 var conditionalComment = /^<!\[/;
 
@@ -3556,7 +3564,7 @@ function parseString (chr) {
 /*  */
 
 var onRE = /^@|^v-on:/;
-var dirRE = /^v-|^@|^:/;
+var dirRE = /^v-|^@|^:|^#/;
 var forAliasRE = /([\s\S]*?)\s+(?:in|of)\s+([\s\S]*)/;
 var forIteratorRE = /,([^,\}\]]*)(?:,([^,\}\]]*))?$/;
 var stripParensRE = /^\(|\)$/g;
@@ -4180,7 +4188,7 @@ function processSlotContent (el) {
           if (el.parent && !maybeComponent(el.parent)) {
             warn$1(
               "<template v-slot> can only appear at the root level inside " +
-              "the receiving the component",
+              "the receiving component",
               el
             );
           }
@@ -4288,7 +4296,7 @@ function processComponent (el) {
 function processAttrs (el) {
   var list = el.attrsList;
   var i, l, name, rawName, value, modifiers, syncGen, isDynamic;
-  for (i = 0, l = list.length; i < l; i++) {
+  for (i = 0, l = list.length; i <  l; i++) {
     name = rawName = list[i].name;
     value = list[i].value;
     if (dirRE.test(name)) {
@@ -4782,7 +4790,7 @@ var baseOptions = {
 
 /*  */
 
-var fnExpRE = /^([\w$_]+|\([^)]*?\))\s*=>|^function\s*(?:[\w$]+)?\s*\(/;
+var fnExpRE = /^([\w$_]+|\([^)]*?\))\s*=>|^function(?:\s+[\w$]+)?\s*\(/;
 var fnInvokeRE = /\([^)]*?\);*$/;
 var simplePathRE = /^[A-Za-z_$][\w$]*(?:\.[A-Za-z_$][\w$]*|\['[^']*?']|\["[^"]*?"]|\[\d+]|\[[A-Za-z_$][\w$]*])*$/;
 
@@ -5995,7 +6003,7 @@ function flattenSegments (segments) {
 var prohibitedKeywordRE = new RegExp('\\b' + (
   'do,if,for,let,new,try,var,case,else,with,await,break,catch,class,const,' +
   'super,throw,while,yield,delete,export,import,return,switch,default,' +
-  'extends,finally,continue,debugger,function,arguments'
+  'extends,finally,continue,,function,arguments'
 ).split(',').join('\\b|\\b') + '\\b');
 
 // these unary operators should not be used as property/method names
@@ -6022,6 +6030,8 @@ function checkNode (node, warn) {
           var range = node.rawAttrsMap[name];
           if (name === 'v-for') {
             checkFor(node, ("v-for=\"" + value + "\""), warn, range);
+          } else if (name === 'v-slot' || name[0] === '#') {
+            checkFunctionParameterExpression(value, (name + "=\"" + value + "\""), warn, range);
           } else if (onRE.test(name)) {
             checkEvent(value, (name + "=\"" + value + "\""), warn, range);
           } else {
@@ -6041,9 +6051,9 @@ function checkNode (node, warn) {
 }
 
 function checkEvent (exp, text, warn, range) {
-  var stipped = exp.replace(stripStringRE, '');
-  var keywordMatch = stipped.match(unaryOperatorsRE);
-  if (keywordMatch && stipped.charAt(keywordMatch.index - 1) !== '$') {
+  var stripped = exp.replace(stripStringRE, '');
+  var keywordMatch = stripped.match(unaryOperatorsRE);
+  if (keywordMatch && stripped.charAt(keywordMatch.index - 1) !== '$') {
     warn(
       "avoid using JavaScript unary operator as property name: " +
       "\"" + (keywordMatch[0]) + "\" in expression " + (text.trim()),
@@ -6095,6 +6105,19 @@ function checkExpression (exp, text, warn, range) {
         range
       );
     }
+  }
+}
+
+function checkFunctionParameterExpression (exp, text, warn, range) {
+  try {
+    new Function(exp, '');
+  } catch (e) {
+    warn(
+      "invalid function parameter expression: " + (e.message) + " in\n\n" +
+      "    " + exp + "\n\n" +
+      "  Raw expression: " + (text.trim()) + "\n",
+      range
+    );
   }
 }
 
@@ -6376,6 +6399,7 @@ var compileToFunctions = ref.compileToFunctions;
 function simpleNormalizeChildren (children) {
   for (var i = 0; i < children.length; i++) {
     if (Array.isArray(children[i])) {
+      // 把嵌套数组拍平成为一维数组
       return Array.prototype.concat.apply([], children)
     }
   }
@@ -6815,6 +6839,7 @@ function createElement (
   if (isTrue(alwaysNormalize)) {
     normalizationType = ALWAYS_NORMALIZE;
   }
+  // 最终调用的是  _createElement
   return _createElement(context, tag, data, children, normalizationType)
 }
 
@@ -6839,7 +6864,7 @@ function _createElement (
   }
   if (!tag) {
     // in case of component :is set to falsy value
-    return createEmptyVNode()
+    return createEmptyVNode() // 创建一个空的vnode
   }
   // warn against non-primitive key
   if (isDef(data) && isDef(data.key) && !isPrimitive(data.key)
@@ -6860,6 +6885,7 @@ function _createElement (
     data.scopedSlots = { default: children[0] };
     children.length = 0;
   }
+  // 对children做normalize
   if (normalizationType === ALWAYS_NORMALIZE) {
     children = normalizeChildren(children);
   } else if (normalizationType === SIMPLE_NORMALIZE) {
@@ -6869,8 +6895,12 @@ function _createElement (
   if (typeof tag === 'string') {
     var Ctor;
     ns = (context.$vnode && context.$vnode.ns) || config.getTagNamespace(tag);
+    /**
+     * tag 判断  string  原生标签  组件 其他
+     */
     if ((!data || !data.pre) && isDef(Ctor = resolveAsset(context.$options, 'components', tag))) {
       // component
+      // 传递的是组件对象
       vnode = createComponent(Ctor, data, context, children, tag);
     } else {
       // unknown or unlisted namespaced elements
@@ -7223,7 +7253,7 @@ function bindDynamicKeys (baseObj, values) {
     if (typeof key === 'string' && key) {
       baseObj[values[i]] = values[i + 1];
     } else if (key !== '' && key !== null) {
-      // null is a speical value for explicitly removing a binding
+      // null is a special value for explicitly removing a binding
       warn(
         ("Invalid value for dynamic directive argument (expected string or null): " + key),
         this
@@ -7705,6 +7735,7 @@ function deactivateChildComponent (vm, direct) {
 
 function callHook (vm, hook) {
   // #7573 disable dep collection when invoking lifecycle hooks
+
   pushTarget();
   var handlers = vm.$options[hook];
   var info = hook + " hook";
@@ -7800,7 +7831,8 @@ function resolveInject (inject, vm) {
 /*  */
 
 function resolveConstructorOptions (Ctor) {
-  var options = Ctor.options;
+  // 解决全局mixin
+  var options = Ctor.options; // Ctor 就是Vue
   if (Ctor.super) {
     var superOptions = resolveConstructorOptions(Ctor.super);
     var cachedSuperOptions = Ctor.superOptions;
@@ -8062,12 +8094,12 @@ function createComponent (
   if (isUndef(Ctor)) {
     return
   }
-
+  // baseCtor ==  Vue
   var baseCtor = context.$options._base;
 
   // plain options object: turn it into a constructor
   if (isObject(Ctor)) {
-    Ctor = baseCtor.extend(Ctor);
+    Ctor = baseCtor.extend(Ctor); // Vue.extend 创建构造器
   }
 
   // if at this stage it's not a constructor or an async component factory,
@@ -8079,7 +8111,7 @@ function createComponent (
     return
   }
 
-  // async component
+  // async component 异步组件
   var asyncFactory;
   if (isUndef(Ctor.cid)) {
     asyncFactory = Ctor;
@@ -8098,7 +8130,7 @@ function createComponent (
     }
   }
 
-  data = data || {};
+  data = data || {}; // data处理
 
   // resolve constructor options in case global mixins are applied after
   // component constructor creation
@@ -8137,10 +8169,12 @@ function createComponent (
   }
 
   // install component management hooks onto the placeholder node
+  // 安装一些组件的钩子 init prepach insert destroy
   installComponentHooks(data);
 
   // return a placeholder vnode
   var name = Ctor.options.name || tag;
+  // 组件vnode的children是空  componentOptions
   var vnode = new VNode(
     ("vue-component-" + (Ctor.cid) + (name ? ("-" + name) : '')),
     data, undefined, undefined, undefined, context,

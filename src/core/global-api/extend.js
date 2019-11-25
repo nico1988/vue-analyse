@@ -20,7 +20,9 @@ export function initExtend (Vue: GlobalAPI) {
     extendOptions = extendOptions || {}
     const Super = this
     const SuperId = Super.cid
+    // _Ctor 缓存优化
     const cachedCtors = extendOptions._Ctor || (extendOptions._Ctor = {})
+    // 优化 已经有直接返回
     if (cachedCtors[SuperId]) {
       return cachedCtors[SuperId]
     }
@@ -29,16 +31,21 @@ export function initExtend (Vue: GlobalAPI) {
     if (process.env.NODE_ENV !== 'production' && name) {
       validateComponentName(name)
     }
-
+    /**
+     * 每个组件都定义一个子构造函数 和vue很像 也是调用了init方法  让sub拥有和vue一样的能力
+     * @param options
+     * @constructor
+     */
     const Sub = function VueComponent (options) {
       this._init(options)
     }
+    // 简单的原型继承
     Sub.prototype = Object.create(Super.prototype)
     Sub.prototype.constructor = Sub
     Sub.cid = cid++
     Sub.options = mergeOptions(
       Super.options,
-      extendOptions
+      extendOptions // 局部注册组件 获取到options中的component
     )
     Sub['super'] = Super
 
@@ -75,6 +82,11 @@ export function initExtend (Vue: GlobalAPI) {
     Sub.sealedOptions = extend({}, Sub.options)
 
     // cache constructor
+    /**
+     * 把sub存储下来
+     * 多个组件引用同一个组件的时候，构造器只会执行一次，如果已经有了，就直接使用，而不是每次重新赋值一遍 优化效率
+     * @type {VueComponent}
+     */
     cachedCtors[SuperId] = Sub
     return Sub
   }

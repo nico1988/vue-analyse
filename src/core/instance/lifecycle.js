@@ -205,7 +205,7 @@ export function mountComponent (
 
   // manually mounted instance, call mounted on self
   // mounted is called for render-created child components in its inserted hook
-  if (vm.$vnode == null) {
+  if (vm.$vnode == null) { // 没有父亲 就是root vnode
     vm._isMounted = true
     callHook(vm, 'mounted')
   }
@@ -335,6 +335,7 @@ export function deactivateChildComponent (vm: Component, direct?: boolean) {
 
 export function callHook (vm: Component, hook: string) {
   // #7573 disable dep collection when invoking lifecycle hooks
+
   pushTarget()
   const handlers = vm.$options[hook]
   const info = `${hook} hook`

@@ -1,5 +1,9 @@
 /* @flow */
-
+/**
+ * vnode其实就是一棵树 用来映射dom的扩展 不包括操作dom的接口
+ * vnode其实比dom简单的多
+ * vue的vnode参考snabbdom
+ */
 export default class VNode {
   tag: string | void;
   data: VNodeData | void;

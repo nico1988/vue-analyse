@@ -49,6 +49,7 @@ export default class Watcher {
     options?: ?Object,
     isRenderWatcher?: boolean
   ) {
+
     this.vm = vm
     if (isRenderWatcher) {
       vm._watcher = this
@@ -116,7 +117,7 @@ export default class Watcher {
       if (this.deep) {
         traverse(value)
       }
-      popTarget()
+      popTarget() // pop 栈结构
       this.cleanupDeps()
     }
     return value

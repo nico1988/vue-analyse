@@ -758,7 +758,7 @@ function processComponent (el) {
 function processAttrs (el) {
   const list = el.attrsList
   let i, l, name, rawName, value, modifiers, syncGen, isDynamic
-  for (i = 0, l = list.length; i < l; i++) {
+  for (i = 0, l = list.length; i <  l; i++) {
     name = rawName = list[i].name
     value = list[i].value
     if (dirRE.test(name)) {

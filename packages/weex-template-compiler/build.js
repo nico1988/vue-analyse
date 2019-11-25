@@ -902,7 +902,7 @@ if (inBrowser) {
     Object.defineProperty(opts, 'passive', ({
       get: function get () {
         /* istanbul ignore next */
-        
+
       }
     })); // https://github.com/facebook/flow/issues/285
     window.addEventListener('test-passive', null, opts);
@@ -941,10 +941,10 @@ var hasSymbol =
 /* istanbul ignore if */ // $flow-disable-line
 if (typeof Set !== 'undefined' && isNative(Set)) {
   // use native Set when available.
-  
+
 } else {
   // a non-standard Set polyfill that only works with primitive keys.
-  
+
 }
 
 /*  */
@@ -2917,7 +2917,7 @@ function flushCallbacks () {
 // events triggered in the same loop is by using MessageChannel.
 /* istanbul ignore if */
 if (typeof setImmediate !== 'undefined' && isNative(setImmediate)) {
-  
+
 } else if (typeof MessageChannel !== 'undefined' && (
   isNative(MessageChannel) ||
   // PhantomJS
@@ -2925,19 +2925,19 @@ if (typeof setImmediate !== 'undefined' && isNative(setImmediate)) {
 )) {
   var channel = new MessageChannel();
   channel.port1.onmessage = flushCallbacks;
-  
+
 } else {
   /* istanbul ignore next */
-  
+
 }
 
 // Determine microtask defer implementation.
 /* istanbul ignore next, $flow-disable-line */
 if (typeof Promise !== 'undefined' && isNative(Promise)) {
-  
+
 } else {
   // fallback to macro
-  
+
 }
 
 /**
@@ -3432,7 +3432,7 @@ function transformSpecialNewlines (text) {
 var prohibitedKeywordRE = new RegExp('\\b' + (
   'do,if,for,let,new,try,var,case,else,with,await,break,catch,class,const,' +
   'super,throw,while,yield,delete,export,import,return,switch,default,' +
-  'extends,finally,continue,debugger,function,arguments'
+  'extends,finally,continue,,function,arguments'
 ).split(',').join('\\b|\\b') + '\\b');
 
 // these unary operators should not be used as property/method names
