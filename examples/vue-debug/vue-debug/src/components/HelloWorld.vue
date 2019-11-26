@@ -28,7 +28,6 @@ export default {
       {{msg22}}
     </div>
     <button @click="change">change</button>
-    &nbsp;
     <button @click="toggle">toggle</button>
     <h3>v-model</h3>
     <input v-model="message" placeholder="edit me">
