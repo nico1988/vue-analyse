@@ -82,11 +82,11 @@ export default {
 
   render () {
     const slot = this.$slots.default
-    const vnode: VNode = getFirstComponentChild(slot)
+    const vnode: VNode = getFirstComponentChild(slot) // 找到第一个组件节点 拿到vnode
     const componentOptions: ?VNodeComponentOptions = vnode && vnode.componentOptions
     if (componentOptions) {
       // check pattern
-      const name: ?string = getComponentName(componentOptions)
+      const name: ?string = getComponentName(componentOptions) // 获取组件name
       const { include, exclude } = this
       if (
         // not included
@@ -109,11 +109,12 @@ export default {
         remove(keys, key)
         keys.push(key)
       } else {
-        cache[key] = vnode
+        cache[key] = vnode // 第一次缓存
         keys.push(key)
         // prune oldest entry
+        // max 缓存清理 优化内存占用 vnode其实比较大的
         if (this.max && keys.length > parseInt(this.max)) {
-          pruneCacheEntry(cache, keys[0], keys, this._vnode)
+          pruneCacheEntry(cache, keys[0], keys, this._vnode) // 缓存管理策略lru思想 删除keys[0]第一个vnode 先从开始删除
         }
       }
 

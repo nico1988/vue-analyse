@@ -42,13 +42,14 @@ let timerFunc
 if (typeof Promise !== 'undefined' && isNative(Promise)) {
   const p = Promise.resolve()
   timerFunc = () => {
+    // 宏任务中套微任务
     p.then(flushCallbacks)
     // In problematic UIWebViews, Promise.then doesn't completely break, but
     // it can get stuck in a weird state where callbacks are pushed into the
     // microtask queue but the queue isn't being flushed, until the browser
     // needs to do some other work, e.g. handle a timer. Therefore we can
     // "force" the microtask queue to be flushed by adding an empty timer.
-    if (isIOS) setTimeout(noop)
+    if (isIOS) setTimeout(noop) // iosbug 通过加入一个空的宏任务 强制队列刷新
   }
   isUsingMicroTask = true
 } else if (!isIE && typeof MutationObserver !== 'undefined' && (
@@ -87,7 +88,7 @@ if (typeof Promise !== 'undefined' && isNative(Promise)) {
 export function nextTick (cb?: Function, ctx?: Object) {
   let _resolve
   callbacks.push(() => {
-    if (cb) {
+    if (cb) { // 这里既可以是callback 也可以是promise
       try {
         cb.call(ctx)
       } catch (e) {

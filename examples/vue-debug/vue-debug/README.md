@@ -22,3 +22,7 @@ yarn lint
 
 ### Customize configuration
 See [Configuration Reference](https://cli.vuejs.org/config/).
+
+debug步骤
+- 修改main.js中vue的引入
+- 修改vue源码中的scripts 加入--sourcemap
