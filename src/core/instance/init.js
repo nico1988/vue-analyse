@@ -36,7 +36,7 @@ export function initMixin (Vue: Class<Component>) {
       // internal component options needs special treatment.
       initInternalComponent(vm, options)
     } else {
-      console.log("_init 被调用1")
+      console.log("_init 被调用")
       console.log("vm.$options = mergeOptions")
       vm.$options = mergeOptions(
         resolveConstructorOptions(vm.constructor),
@@ -61,7 +61,7 @@ export function initMixin (Vue: Class<Component>) {
     // 执行beforeCreate钩子函数
     callHook(vm, 'beforeCreate')
     initInjections(vm) // resolve injections before data/props
-    initState(vm)
+    initState(vm) // 初始化state
     initProvide(vm) // resolve provide after data/props
     // 执行created钩子函数
     callHook(vm, 'created')
@@ -73,7 +73,7 @@ export function initMixin (Vue: Class<Component>) {
       measure(`vue ${vm._name} init`, startTag, endTag)
     }
 
-    if (vm.$options.el) {
+    if (vm.$options.el) { // $mount
       vm.$mount(vm.$options.el)
     }
   }

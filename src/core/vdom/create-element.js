@@ -33,7 +33,7 @@ export function createElement (
   normalizationType: any,
   alwaysNormalize: boolean
 ): VNode | Array<VNode> {
-  if (Array.isArray(data) || isPrimitive(data)) {
+  if (Array.isArray(data) || isPrimitive(data)) { // 模拟重载
     normalizationType = children
     children = data
     data = undefined
@@ -52,13 +52,13 @@ export function _createElement (
   children?: any,
   normalizationType?: number
 ): VNode | Array<VNode> {
-  if (isDef(data) && isDef((data: any).__ob__)) {
+  if (isDef(data) && isDef((data: any).__ob__)) { // 不允许vnodedata是响应式的
     process.env.NODE_ENV !== 'production' && warn(
       `Avoid using observed data object as vnode data: ${JSON.stringify(data)}\n` +
       'Always create fresh vnode data objects in each render!',
       context
     )
-    return createEmptyVNode()
+    return createEmptyVNode() // 创建一个空的vnode 理解为注释vnode
   }
   // object syntax in v-bind
   if (isDef(data) && isDef(data.is)) {
@@ -66,7 +66,7 @@ export function _createElement (
   }
   if (!tag) {
     // in case of component :is set to falsy value
-    return createEmptyVNode() // 创建一个空的vnode
+    return createEmptyVNode() // 创建一个空的vnode 理解为注释vnode
   }
   // warn against non-primitive key
   if (process.env.NODE_ENV !== 'production' &&
@@ -88,7 +88,7 @@ export function _createElement (
     data.scopedSlots = { default: children[0] }
     children.length = 0
   }
-  // 对children做normalize
+  // !!! 比较重要  对children做normalize why？ 处理成一维数组 方便后期处理
   if (normalizationType === ALWAYS_NORMALIZE) {
     children = normalizeChildren(children)
   } else if (normalizationType === SIMPLE_NORMALIZE) {
@@ -101,7 +101,7 @@ export function _createElement (
     /**
      * tag 判断  string  原生标签  组件 其他
      */
-    if (config.isReservedTag(tag)) { // 是否是保留标签
+    if (config.isReservedTag(tag)) { // 是否是html保留标签
       // platform built-in elements
       if (process.env.NODE_ENV !== 'production' && isDef(data) && isDef(data.nativeOn)) {
         warn(
@@ -118,7 +118,7 @@ export function _createElement (
       // 传递的是组件对象
       vnode = createComponent(Ctor, data, context, children, tag)
     } else {
-      // unknown or unlisted namespaced elements
+      // unknown or unlisted namespaced elements  其他不认识的
       // check at runtime because it may get assigned a namespace when its
       // parent normalizes children
       vnode = new VNode(
@@ -132,7 +132,7 @@ export function _createElement (
   }
   if (Array.isArray(vnode)) {
     return vnode
-  } else if (isDef(vnode)) {
+  } else if (isDef(vnode)) { // v !== undefined && v !== null
     if (isDef(ns)) applyNS(vnode, ns)
     if (isDef(data)) registerDeepBindings(data)
     return vnode

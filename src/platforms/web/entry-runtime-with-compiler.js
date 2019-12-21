@@ -14,7 +14,7 @@ const idToTemplate = cached(id => {
   return el && el.innerHTML
 })
 
-const mount = Vue.prototype.$mount
+const mount = Vue.prototype.$mount // 缓存一个Vue.prototype.$mount 并不是下面这个
 Vue.prototype.$mount = function (
   el?: string | Element,
   hydrating?: boolean
@@ -54,9 +54,9 @@ Vue.prototype.$mount = function (
         return this
       }
     } else if (el) {
-      template = getOuterHTML(el)
+      template = getOuterHTML(el) // 获取到html
     }
-    if (template) {
+    if (template) {// 这里就是编译了
       /* istanbul ignore if */
       if (process.env.NODE_ENV !== 'production' && config.performance && mark) {
         mark('compile')

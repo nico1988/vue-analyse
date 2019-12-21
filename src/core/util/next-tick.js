@@ -5,12 +5,13 @@ import { noop } from 'shared/util'
 import { handleError } from './error'
 import { isIE, isIOS, isNative } from './env'
 
-export let isUsingMicroTask = false
+export let isUsingMicroTask = false // 解决浏览器事件传播中使用微任务产生的bug
 
 const callbacks = []
 let pending = false
 
 function flushCallbacks () {
+  // 执行callbacks
   pending = false
   const copies = callbacks.slice(0)
   callbacks.length = 0
@@ -42,7 +43,6 @@ let timerFunc
 if (typeof Promise !== 'undefined' && isNative(Promise)) {
   const p = Promise.resolve()
   timerFunc = () => {
-    // 宏任务中套微任务
     p.then(flushCallbacks)
     // In problematic UIWebViews, Promise.then doesn't completely break, but
     // it can get stuck in a weird state where callbacks are pushed into the
@@ -55,7 +55,7 @@ if (typeof Promise !== 'undefined' && isNative(Promise)) {
 } else if (!isIE && typeof MutationObserver !== 'undefined' && (
   isNative(MutationObserver) ||
   // PhantomJS and iOS 7.x
-  MutationObserver.toString() === '[object MutationObserverConstructor]'
+  MutationObserver.toString() === '[object MutationObserverConstructor]' // 这里貌似有错误"function MutationObserver() { [native code] }"
 )) {
   // Use MutationObserver where native Promise is not available,
   // e.g. PhantomJS, iOS7, Android 4.4
@@ -87,8 +87,10 @@ if (typeof Promise !== 'undefined' && isNative(Promise)) {
 
 export function nextTick (cb?: Function, ctx?: Object) {
   let _resolve
-  callbacks.push(() => {
+  // 传入组件或者全局
+  callbacks.push(() => { // 匿名函数传递到callbacks数组中
     if (cb) { // 这里既可以是callback 也可以是promise
+      // 如果不try catch js是单线程的，如果单个cb执行失败，也不影响主线程执行
       try {
         cb.call(ctx)
       } catch (e) {
@@ -98,12 +100,12 @@ export function nextTick (cb?: Function, ctx?: Object) {
       _resolve(ctx)
     }
   })
-  if (!pending) {
+  if (!pending) { // 只执行一次
     pending = true
     timerFunc()
   }
   // $flow-disable-line
-  if (!cb && typeof Promise !== 'undefined') {
+  if (!cb && typeof Promise !== 'undefined') { // 如果是promise 返回一个promise
     return new Promise(resolve => {
       _resolve = resolve
     })

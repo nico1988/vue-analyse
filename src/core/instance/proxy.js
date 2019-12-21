@@ -76,7 +76,7 @@ if (process.env.NODE_ENV !== 'production') {
   }
 
   initProxy = function initProxy (vm) {
-    if (hasProxy) {
+    if (hasProxy) { // 如果支持proxy
       // determine which proxy handler to use
       const options = vm.$options
       const handlers = options.render && options.render._withStripped

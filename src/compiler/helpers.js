@@ -145,7 +145,6 @@ export function addHandler (
   } else {
     events[name] = newHandler
   }
-
   el.plain = false
 }
 

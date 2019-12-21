@@ -73,7 +73,7 @@ export function createPatchFunction (backend) {
 
   const { modules, nodeOps } = backend
 
-  for (i = 0; i < hooks.length; ++i) {
+  for (i = 0; i < hooks.length; ++i) { // hook 保存到 cbs  snabbdom的设计  创建 激活 更新有各种钩子触发
     cbs[hooks[i]] = []
     for (j = 0; j < modules.length; ++j) {
       if (isDef(modules[j][hooks[i]])) {

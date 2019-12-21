@@ -51,7 +51,7 @@ export function initState (vm: Component) {
   if (opts.props) initProps(vm, opts.props)
   if (opts.methods) initMethods(vm, opts.methods)
   if (opts.data) {
-    initData(vm)
+    initData(vm) // 初始化data
   } else {
     observe(vm._data = {}, true /* asRootData */)
   }
@@ -144,11 +144,11 @@ function initData (vm: Component) {
         vm
       )
     } else if (!isReserved(key)) {
-      proxy(vm, `_data`, key)
+      proxy(vm, `_data`, key) // 代理 this.msg ==> this.data.msg
     }
   }
   // observe data
-  observe(data, true /* asRootData */)
+  observe(data, true /* asRootData */) // 响应式处理
 }
 
 export function getData (data: Function, vm: Component): any {

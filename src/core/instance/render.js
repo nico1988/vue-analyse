@@ -28,10 +28,10 @@ export function initRender (vm: Component) {
   // so that we get proper render context inside it.
   // args order: tag, data, children, normalizationType, alwaysNormalize
   // internal version is used by render functions compiled from templates
-  vm._c = (a, b, c, d) => createElement(vm, a, b, c, d, false)
+  vm._c = (a, b, c, d) => createElement(vm, a, b, c, d, false) // 编译生成的render函数所使用的方法
   // normalization is always applied for the public version, used in
   // user-written render functions.
-  vm.$createElement = (a, b, c, d) => createElement(vm, a, b, c, d, true)
+  vm.$createElement = (a, b, c, d) => createElement(vm, a, b, c, d, true)// 手写的render function
 
   // $attrs & $listeners are exposed for easier HOC creation.
   // they need to be reactive so that HOCs using them are always updated
@@ -88,7 +88,7 @@ export function renderMixin (Vue: Class<Component>) {
       // separately from one another. Nested component's render fns are called
       // when parent component is patched.
       currentRenderingInstance = vm
-      vnode = render.call(vm._renderProxy, vm.$createElement)
+      vnode = render.call(vm._renderProxy, vm.$createElement) // vm._renderProxy（inint.js:49/53）开发环境是proxy对象  生产环境就是vm本身
     } catch (e) {
       handleError(e, vm, `render`)
       // return error render result,
@@ -113,7 +113,7 @@ export function renderMixin (Vue: Class<Component>) {
     }
     // return empty vnode in case the render function errored out
     if (!(vnode instanceof VNode)) {
-      // 如果有多个跟节点 根节点只有一个vnode
+      // 如果有多个根节点 根节点只有一个vnode
       if (process.env.NODE_ENV !== 'production' && Array.isArray(vnode)) {
         warn(
           'Multiple root nodes returned from render function. Render function ' +
@@ -125,6 +125,6 @@ export function renderMixin (Vue: Class<Component>) {
     }
     // set parent
     vnode.parent = _parentVnode
-    return vnode
+    return vnode // vnode就是virtual dom的概念
   }
 }

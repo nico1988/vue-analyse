@@ -1,8 +1,6 @@
 <!--eslint-disable-->
 <template>
   <div id="app">
-<!--    <img alt="Vue logo" src="./assets/logo.png">-->
-<!--    <HelloWorld msg="Welcome to Your Vue.js App"/>-->
     <Header></Header>
     <router-view/>
   </div>
@@ -13,6 +11,14 @@ import HelloWorld from './components/HelloWorld.vue'
 import Header from './components/Header'
 export default {
   name: 'App',
+  data(){
+    return {
+        msg: "msg",
+        msg1: "msg",
+        msg2: "msg",
+        msg3: "msg"
+    }
+  },
   components: {
     HelloWorld,
     Header

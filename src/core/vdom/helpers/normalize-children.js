@@ -18,7 +18,7 @@ import { isFalse, isTrue, isDef, isUndef, isPrimitive } from 'shared/util'
 export function simpleNormalizeChildren (children: any) {
   for (let i = 0; i < children.length; i++) {
     if (Array.isArray(children[i])) {
-      // 把嵌套数组拍平成为一维数组
+      // 可能数组中有数组  只考虑一级的children是否是数组 不考虑下下级 把嵌套数组拍平成为一维数组 可能有函数式组件
       return Array.prototype.concat.apply([], children)
     }
   }
@@ -42,6 +42,7 @@ function isTextNode (node): boolean {
 }
 
 function normalizeArrayChildren (children: any, nestedIndex?: string): Array<VNode> {
+  // 递归拍平children 到一维数组中
   const res = []
   let i, c, lastIndex, last
   for (i = 0; i < children.length; i++) {
@@ -50,17 +51,17 @@ function normalizeArrayChildren (children: any, nestedIndex?: string): Array<VNo
     lastIndex = res.length - 1
     last = res[lastIndex]
     //  nested
-    if (Array.isArray(c)) {
+    if (Array.isArray(c)) { // 子节点又是array
       if (c.length > 0) {
-        c = normalizeArrayChildren(c, `${nestedIndex || ''}_${i}`)
+        c = normalizeArrayChildren(c, `${nestedIndex || ''}_${i}`) // 递归调用
         // merge adjacent text nodes
-        if (isTextNode(c[0]) && isTextNode(last)) {
+        if (isTextNode(c[0]) && isTextNode(last)) { // 优化
           res[lastIndex] = createTextVNode(last.text + (c[0]: any).text)
           c.shift()
         }
         res.push.apply(res, c)
       }
-    } else if (isPrimitive(c)) {
+    } else if (isPrimitive(c)) { // 基础类型
       if (isTextNode(last)) {
         // merge adjacent text nodes
         // this is necessary for SSR hydration because text nodes are

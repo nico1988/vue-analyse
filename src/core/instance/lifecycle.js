@@ -66,7 +66,7 @@ export function lifecycleMixin (Vue: Class<Component>) {
     // based on the rendering backend used.
     if (!prevVnode) {
       // initial render
-      vm.$el = vm.__patch__(vm.$el, vnode, hydrating, false /* removeOnly */)
+      vm.$el = vm.__patch__(vm.$el, vnode, hydrating, false /* removeOnly */)  // 首次渲染 platform/web/runtime/index.js
     } else {
       // updates
       vm.$el = vm.__patch__(prevVnode, vnode)
