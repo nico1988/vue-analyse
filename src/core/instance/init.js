@@ -38,7 +38,7 @@ export function initMixin (Vue: Class<Component>) {
     } else {
       console.log("_init 被调用")
       console.log("vm.$options = mergeOptions")
-      vm.$options = mergeOptions(
+      vm.$options = mergeOptions( // 合并options
         resolveConstructorOptions(vm.constructor),
         options || {},
         vm

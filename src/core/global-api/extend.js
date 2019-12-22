@@ -15,10 +15,11 @@ export function initExtend (Vue: GlobalAPI) {
 
   /**
    * Class inheritance
+   * Vue.extend使用原型继承的方式 返回一个构造器 这样每个组件都有一个独立的构造器
    */
   Vue.extend = function (extendOptions: Object): Function {
     extendOptions = extendOptions || {}
-    const Super = this
+    const Super = this // this --> Vue
     const SuperId = Super.cid
     // _Ctor 缓存优化
     const cachedCtors = extendOptions._Ctor || (extendOptions._Ctor = {})
@@ -32,14 +33,14 @@ export function initExtend (Vue: GlobalAPI) {
       validateComponentName(name)
     }
     /**
-     * 每个组件都定义一个子构造函数 和vue很像 也是调用了init方法  让sub拥有和vue一样的能力
+     * 每个组件都定义一个子构造函数 和Vue很像 也是调用了init方法  让sub拥有和vue一样的能力
      * @param options
      * @constructor
      */
     const Sub = function VueComponent (options) {
       this._init(options)
     }
-    // 简单的原型继承
+    // 简单的原型继承 执行Sub --> this._init 其实就是执行Vue的init方法
     Sub.prototype = Object.create(Super.prototype)
     Sub.prototype.constructor = Sub
     Sub.cid = cid++

@@ -5903,7 +5903,18 @@ function createKeyToOldIdx (children, beginIdx, endIdx) {
   }
   return map
 }
-
+/*
+* 一堆的闭包
+* 函数柯里化 backend 其实就是跟平台相关的方法 vuejs跨平台 web weex
+* 好处 patch的过程中 不用每次在patch的过程中都去判断是何种平台 否则一堆的if else
+* web平台 platforms\web\runtime\patch.js  patch: Function = createPatchFunction({ nodeOps, modules })
+* weex平台 platforms\weex\runtime\patch.js
+* export const patch: Function = createPatchFunction({
+*   nodeOps,
+*   modules,
+*   LONG_LIST_THRESHOLD: 10
+* })
+* */
 function createPatchFunction (backend) {
   var i, j;
   var cbs = {};
@@ -6032,7 +6043,7 @@ function createPatchFunction (backend) {
     if (isDef(i)) {
       var isReactivated = isDef(vnode.componentInstance) && i.keepAlive;
       if (isDef(i = i.hook) && isDef(i = i.init)) {
-        i(vnode, false /* hydrating */);
+        i(vnode, false /* hydrating */); // 这里调用 vue的init方法，等于重新走了一遍init流程
       }
       // after calling the init hook, if the vnode is a child component
       // it should've created a child instance and mounted it. the child

@@ -109,11 +109,11 @@ export function createComponent (
     return
   }
   // baseCtor ==  Vue
-  const baseCtor = context.$options._base
+  const baseCtor = context.$options._base // base 就是 Vue _base在global-api $option在instance/init.js中通过mergeoptions获取base
 
   // plain options object: turn it into a constructor
   if (isObject(Ctor)) {
-    Ctor = baseCtor.extend(Ctor) // Vue.extend 创建构造器
+    Ctor = baseCtor.extend(Ctor) // global-api/extend.js Vue.extend 创建构造器
   }
 
   // if at this stage it's not a constructor or an async component factory,
@@ -188,7 +188,7 @@ export function createComponent (
 
   // return a placeholder vnode
   const name = Ctor.options.name || tag
-  // 组件vnode的children是空  componentOptions
+  // 组件vnode的children是空 第三个参数是空的 componentOptions
   const vnode = new VNode(
     `vue-component-${Ctor.cid}${name ? `-${name}` : ''}`,
     data, undefined, undefined, undefined, context,
@@ -226,6 +226,7 @@ export function createComponentInstanceForVnode (
 }
 
 function installComponentHooks (data: VNodeData) {
+  // 把componentVNodeHooks merge 到data.hooks上
   const hooks = data.hook || (data.hook = {})
   for (let i = 0; i < hooksToMerge.length; i++) {
     const key = hooksToMerge[i]
